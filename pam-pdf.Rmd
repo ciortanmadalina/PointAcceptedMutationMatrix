@@ -2,7 +2,7 @@
 title: "TP- PAM"
 author: "Madalina Ciortan"
 date: "December 17, 2016"
-output: html_document
+output: pdf_document
 ---
 
 ## TP: Substitution matrices
@@ -11,7 +11,7 @@ Read data from the file (note that columns names and row names should be discard
 
 
 ```{r}
-setwd("D:\\workspace\\bioinformatics\\pam")
+setwd("C:\\workspace\\bio-info-db\\pam")
 P1<-read.table('pam1.mat', sep = "\t", header=T, colClasses=c("character",rep("integer",20)))  
 P1 <- P1[1:20,2:21]
 P1 <-as.matrix(P1)
@@ -20,6 +20,7 @@ P1 <- P1/10000
 #Print P1 diag
 diag(P1)
 ```
+
 
 Compute the probability matrix corresponding to any PAM distance n (corresponding to an evolutionary distance of n PAM, i.e. the PAMn probability matrix). 
 
@@ -40,6 +41,7 @@ P10 <- mypower(P1, 10)
 diag(P10)
 
 ```
+
 
 Compute the scoring matrix corresponding to your PAMn matrix.
 
