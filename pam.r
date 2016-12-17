@@ -1,0 +1,77 @@
+setwd("D:\\workspace\\bioinformatics\\pam")
+ 
+"
+Read data from the file (note that columns names and row names should be discarded for 
+subsequent computation and that the values given should be divided by 10000). 
+"
+
+P1<-read.table('pam1.mat', sep = "\t", header=T, colClasses=c("character",rep("integer",20)))  
+P1 <- P1[1:20,2:21]  # to remove column names
+P1 <-as.matrix(P1)
+
+P1 <- P1/10000
+
+
+"
+Compute the probability matrix corresponding to any PAM distance n (corresponding to an evolutionary distance of n PAM, 
+i.e. the PAMn probability matrix). 
+"
+mypower <- function(x,n){
+  p<-x
+  prod<-diag(nrow(x))
+  while ( n > 0 ){
+    if(n %% 2 == 1) {
+      prod <- prod %*% p
+    } 
+    n <- floor(n/2)
+    p <- p %*% p
+  }
+  prod
+}
+P10 <- mypower(P1, 10)
+
+"
+Compute the scoring matrix corresponding to your PAMn matrix. 
+score(i,j) = log(Pn / fj)
+
+"
+freq <-read.table('aafreq.mat', sep = "\t", header=F)  
+f <- freq$V2
+
+score <- function(x, i, j) {
+  log10(x/f[i])
+}
+
+
+scoringMatrix <- function(mat) {
+  matrix(mapply(score, mat, row(mat), col(mat)), nrow = nrow(mat))
+}
+
+scoringMatrix(P10)
+
+"
+Check the convergence of the values in the columns of the PAM probability matrix when n becomes large: 
+These values should approach the amino acid frequencies. 
+"
+convergence <- c (sum (f - diag(mypower(P1, 1500))), 
+                  sum (f - diag(mypower(P1, 1650))), 
+                  sum (f - diag(mypower(P1, 1800))), 
+                  sum (f - diag(mypower(P1, 2000))),
+                  sum (f - diag(mypower(P1, 2150))),
+                  sum (f - diag(mypower(P1, 2300))))
+                  
+hist(convergence)
+
+"
+Plot the relation between the evolutionary distance (in PAM unit) and the percentage of identity between the sequences 
+"
+
+
+
+nIndexes <- seq(1,1500, 20) # take n values at 20 Pam distance from 1 to 1500
+distance <- function (value) {
+  sum(diag(mypower(P1, value)))
+}
+
+hist(sapply(nIndexes, distance), nclass = 50)
+
